@@ -1,5 +1,8 @@
 use std::fmt::{self, write};
 
+use serde::{Deserialize, Serialize};
+
+#[derive(PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub struct ShippingWeight(f64);
 
 impl ShippingWeight {

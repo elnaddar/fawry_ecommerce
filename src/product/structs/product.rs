@@ -1,9 +1,12 @@
+use serde::{Deserialize, Serialize};
+
 use crate::product::structs::{ExpirationDate, ShippingWeight};
 
+#[derive(PartialEq, Clone, Serialize, Deserialize)]
 pub struct Product {
-    name: String,
-    price: u64,
-    quntity: u64,
-    expiry_date: Option<ExpirationDate>,
-    shipping_info: Option<ShippingWeight>
+    pub name: String,
+    pub price: u64,
+    pub quntity: u64,
+    pub expiry_date: Option<ExpirationDate>,
+    pub shipping_info: Option<ShippingWeight>,
 }

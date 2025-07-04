@@ -1,6 +1,8 @@
 use std::fmt;
 use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
 
+#[derive(PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub struct ExpirationDate(DateTime<Local>);
 impl ExpirationDate {
     pub fn new(datetime: DateTime<Local>) -> Self {
