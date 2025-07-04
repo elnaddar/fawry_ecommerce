@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use clap::builder::Str;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -10,14 +11,16 @@ use crate::{
 
 #[derive(PartialEq, Clone, Serialize, Deserialize)]
 pub struct Cart {
+    balance: u64,
     items: HashMap<String, CartItem>,
 }
 
-const CART_DATA_PATH: &str = "products.json";
+const CART_DATA_PATH: &str = "cart.json";
 
 impl Cart {
     pub fn new() -> Self {
         Self {
+            balance: 1000,
             items: HashMap::new(),
         }
     }
@@ -28,7 +31,7 @@ impl Cart {
             true => Err(Error {
                 msg: "Couldn't Initialize cart file.".to_string(),
             }),
-            false => match std::fs::write(path, "{items:{}}") {
+            false => match std::fs::write(path, "{\"balance\":1000,\"items\":{}}") {
                 Ok(_) => Ok(Success {
                     msg: "Initialized cart file successfully".to_string(),
                 }),
@@ -129,6 +132,63 @@ impl Cart {
                 }),
             },
             Err(err) => Err(err),
+        }
+    }
+}
+
+impl Cart {
+    pub fn checkout() {
+        if let Ok(cart) = Self::get() {
+            let mut subtotal: u64 = 0;
+            let mut shipping: f64 = 0f64;
+            let mut shipment_notice = String::new();
+            let mut checkout_recipt = String::new();
+
+            shipment_notice.push_str("** Shipment notice **\n");
+            checkout_recipt.push_str("** Checkout receipt **\n");
+
+            for (_k, v) in cart.items {
+                subtotal += v.price * v.quantity;
+
+                let recipt_line = format!(
+                    "{}x {}{:<10}{:<5}\n",
+                    v.quantity,
+                    v.name.clone(),
+                    "",
+                    v.quantity * v.price
+                );
+                checkout_recipt.push_str(&recipt_line);
+
+                if let Some(exp) = v.expiry_date
+                    && exp.is_expired()
+                {
+                    panic!("{} item is expired", v.name)
+                }
+
+                if let Some(ship) = v.shipping_info {
+                    shipping += v.quantity as f64 * ship.get_in_f64();
+                    let ship_line = format!(
+                        "{}x {}{:<10}{:.2}g\n",
+                        v.quantity,
+                        v.name.clone(),
+                        "",
+                        v.quantity as f64 * ship.get_in_f64()
+                    );
+                    shipment_notice.push_str(&ship_line);
+                }
+
+                shipment_notice.push_str(&format!("Total package weight {shipping}g\n"));
+                shipping = 50f64;
+
+                println!("{shipment_notice}");
+                println!("{checkout_recipt}");
+                println!("{:-<20}", "");
+                println!("{:<15}{:<5}", "Subtotal", subtotal);
+                println!("{:<15}{:.2}", "Shipping", shipping);
+                println!("{:<15}{:.2}", "Total", shipping + subtotal as f64);
+            }
+        } else {
+            println!("Error");
         }
     }
 }

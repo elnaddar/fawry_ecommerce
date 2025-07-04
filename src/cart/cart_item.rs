@@ -12,7 +12,7 @@ pub struct CartItem {
 }
 
 impl CartItem {
-    fn from_product(quantity: u64, product: Product) -> Self {
+    pub fn from_product(quantity: u64, product: Product) -> Self {
         if quantity == 0 {
             panic!("Quantity cannot be 0")
         }

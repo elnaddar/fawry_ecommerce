@@ -14,7 +14,7 @@ impl ShippingWeight {
     }
 
     pub fn calculate_price(&self) -> f64 {
-        self.0 * 1.5
+        self.0 * 0.2
     }
 }
 
