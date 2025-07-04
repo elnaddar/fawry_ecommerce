@@ -9,7 +9,10 @@ impl Crud<String, Product> for Product {
     fn init_storage() -> Result<Success, Error> {
         let path = std::path::Path::new(PRODUCTS_DATA_PATH);
         match path.exists() {
-            true => match std::fs::write(path, "{}") {
+            true => Err(Error {
+                msg: "Couldn't Initialize products file.".to_string(),
+            }),
+            false => match std::fs::write(path, "{}") {
                 Ok(_) => Ok(Success {
                     msg: "Initialized products file successfully".to_string(),
                 }),
@@ -17,9 +20,6 @@ impl Crud<String, Product> for Product {
                     msg: err.to_string(),
                 }),
             },
-            false => Err(Error {
-                msg: "Couldn't Initialize products file.".to_string(),
-            }),
         }
     }
 
